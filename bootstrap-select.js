@@ -610,7 +610,26 @@
 
             this.$searchbox.on('input propertychange', function() {
                 if (that.$searchbox.val()) {
-                    that.$menu.find('li').show().not(':icontains(' + that.$searchbox.val() + ')').hide();
+                    var lis=that.$menu.find('li').show().not('.no-results'),
+                    	sectionHasVisibleItems=false;
+                    for(var i=lis.length; i--;){
+                    	var visible=$('.text', lis[i]).is(':icontains(' + that.$searchbox.val() + ')'),
+                    		hasGroupHead=$('dt', lis[i]).length;
+                    	if(hasGroupHead){
+                    		if(!visible){	// if the option is hidden
+                    			if(sectionHasVisibleItems)	// but the group has other visible options
+                    				$('.opt', lis[i]).hide();			// then only hide the option
+                    			else
+                    				$(lis[i]).hide();
+                    		}
+                    		sectionHasVisibleItems=false;	// reset the flag
+                    	}else{
+                    		if(visible)
+                    			sectionHasVisibleItems=true;	// set the flag
+                    		else
+                    			$(lis[i]).hide();
+                    	}
+                    }
                     
                     if (!that.$menu.find('li').filter(':visible:not(.no-results)').length) {
                         if (!!no_results.parent().length) no_results.remove();
@@ -621,7 +640,7 @@
                     }
                     
                 } else {
-                    that.$menu.find('li').show();
+                    that.$menu.find('li, li a').show();
                     if (!!no_results.parent().length) no_results.remove();
                 }
 
@@ -711,7 +730,7 @@
                     that.$menu.parent().removeClass('open');
                     that.$button.focus();
                 }
-                $items = $('[role=menu] li:not(.divider):visible', $parent);
+                $items = $('[role=menu] li:not(.divider) a:visible', $parent).parent();
                 if (!$this.val() && !/(38|40)/.test(e.keyCode)) {
                     if ($items.filter('.active').length === 0) {
                         $items = that.$newElement.find('li').filter(':icontains(' + keyCodeMap[e.keyCode] + ')');
