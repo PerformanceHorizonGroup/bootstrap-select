@@ -76,8 +76,8 @@
             this.setStyle();
             this.setWidth();
             if (this.options.container) this.selectPosition();
-            this.$menu.data('this', this);
-            this.$newElement.data('this', this);
+            this.$menu.data('selectpicker', this);
+            this.$newElement.data('selectpicker', this);
         },
 
         createDropdown: function() {
@@ -652,7 +652,7 @@
             
             if ($this.is('input')) $parent = $this.parent().parent();
 
-            that = $parent.data('this');
+            that = $parent.data('selectpicker');
             
             if (that.options.liveSearch) $parent = $this.parent().parent();
 
