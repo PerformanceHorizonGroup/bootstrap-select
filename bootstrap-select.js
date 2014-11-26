@@ -81,39 +81,65 @@
             
             // setup "focus" and "blur"
             var hasFocus=false;
+			function check(el, relEl){
+    			var found=false;
+    			while(relEl){
+    				if(relEl==el){
+    					found=true;
+    					break;
+    				}
+    				relEl=relEl.parentNode;
+    			}
+    			return found;
+			}
+			function triggerFocus(){
+        		hasFocus=true;
+            	that.$element.triggerHandler('focus');
+			}
+			function triggerBlur(){
+    			hasFocus=false;
+            	that.$element.triggerHandler('blur');
+			}
             this.$newElement.on('focusin focusout', function (evt){
             	// !! use triggerHandler instead of trigger so that only the event handlers are called without trying to set/unset focus
             	that.$element.triggerHandler(evt.type, evt);
             	if(evt.type=='focusin'){
-            		if(!hasFocus){
-	            		hasFocus=true;
-		            	that.$element.triggerHandler('focus');
-            		}
+            		if(!hasFocus)
+            			triggerFocus();
             	}else if(evt.type=='focusout'){
             		if(hasFocus){
 	            		var isBlur=!evt.relatedTarget; // must be "blur" the related target is not specified
 	            		if(!isBlur){ // if we have a related target
 	            			// check if relatedTarget may be one of the elements of this control
-	            			var el=that.$newElement.get(0),
-	            				relEl=evt.relatedTarget,
-	            				found=false;
-	            			while(relEl){
-	            				if(relEl==el){
-	            					found=true;
-	            					break;
-	            				}
-	            				relEl=relEl.parentNode;
-	            			}
-	            			if(!found)
+	            			if(!(that.options.container && check(that.$menu.get(0), evt.relatedTarget)) && !check(this, evt.relatedTarget))
 	            				isBlur=true;
 	            		}
-	            		if(isBlur){
-	            			hasFocus=false;
-			            	that.$element.triggerHandler('blur');
-	            		}
+	            		if(isBlur)
+	            			triggerBlur()
             		}
             	}
             });
+            if(this.options.container){
+	            this.$menu.on('focusin focusout', function (evt){
+	            	// !! use triggerHandler instead of trigger so that only the event handlers are called without trying to set/unset focus
+	            	that.$element.triggerHandler(evt.type, evt);
+	            	if(evt.type=='focusin'){
+	            		if(!hasFocus)
+	            			triggerFocus();
+	            	}else if(evt.type=='focusout'){
+	            		if(hasFocus){
+		            		var isBlur=!evt.relatedTarget; // must be "blur" the related target is not specified
+		            		if(!isBlur){ // if we have a related target
+		            			// check if relatedTarget may be one of the elements of this control
+		            			if(!check(this, evt.relatedTarget) && !check(that.$newElement.get(0), evt.relatedTarget))
+		            				isBlur=true;
+		            		}
+		            		if(isBlur)
+		            			triggerBlur()
+	            		}
+	            	}
+	            });
+            }
         },
 
         createDropdown: function() {
