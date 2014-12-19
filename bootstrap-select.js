@@ -233,7 +233,9 @@
             var title = !this.multiple ? selectedItems[0] : selectedItems.join(this.options.multipleSeparator);
 
             //If this is multi select, and the selectText type is count, the show 1 of 2 selected etc..
-            if (this.multiple && this.options.selectedTextFormat.indexOf('count') > -1) {
+         	if(typeof this.options.selectedTextFormat == 'function')
+         		title=this.options.selectedTextFormat(this, selectedItems);
+            else if (this.multiple && this.options.selectedTextFormat.indexOf('count') > -1 ){
                 var max = this.options.selectedTextFormat.split('>');
                 var notDisabled = this.options.hideDisabled ? ':not([disabled])' : '';
                 if ( (max.length>1 && selectedItems.length > max[1]) || (max.length==1 && selectedItems.length>=2)) {
