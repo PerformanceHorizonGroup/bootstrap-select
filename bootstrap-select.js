@@ -310,7 +310,8 @@
                 title = this.options.title !== undefined ? this.options.title : this.options.noneSelectedText;
             }
 
-            this.$button.attr('title', $.trim($("<div/>").html(title).text()).replace(/\s\s+/g, ' '));
+            var tooltipText = this.options.tooltipTextFormat ? this.options.tooltipTextFormat(this, selectedItems, title) : title;
+            this.$button.attr('title', $.trim($("<div/>").html(tooltipText).text()).replace(/\s\s+/g, ' '));
             this.$newElement.find('.filter-option').html(title);
         },
 
@@ -929,6 +930,7 @@
         size: 'auto',
         title: null,
         selectedTextFormat : 'values',
+        tooltipTextFormat : null,
         noneSelectedText : 'Nothing selected',
         noneResultsText : 'No results match',
         countSelectedText: '{0} of {1} selected',
